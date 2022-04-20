@@ -95,7 +95,7 @@
           part2.push(`  late${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
 
           part3.push(`    ${key} = ${type}.fromJson(json['${key}']);`);
-          part4.push(`    _data['${key}'] = ${key}.toJson();`);
+          part4.push(`    _data['${key}'] = ${key}${config.required ? '' : '?'}.toJson();`);
         } else {
           part2.push(`  late${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
           part3.push(`    ${key} = json['${key}'];`);
