@@ -81,23 +81,31 @@
         part1.push(`    ${config.required ? 'required ' : ''}this.${key},`);
 
         if (Array.isArray(value)) {
-          const t = name + key[0].toUpperCase() + key.replace(/(.+)s$/, '$1').slice(1);
-          const type = `${typesMap.array}<${t}>`;
-          const v = value.reduce((a, b) => ({ ...a, ...b }), {});
-          dep.push(jsonToDart(v, t, config));
-          part2.push(`  late${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
-          part3.push(`    ${key} = List${config.required ? '' : '?'}.from(json['${key}']).map((e) => ${t}.fromJson(e)).toList();`);
-          part4.push(`    _data['${key}'] = ${key}${config.required ? '' : '?'}.map((e) => e.toJson()).toList();`);
+          let t = name + key[0].toUpperCase() + key.replace(/(.+)s$/, '$1').slice(1);
+          const _t = value.reduce((a, b) => (a === typesMap[typeof b] ? a : 'dynamic'), typesMap[typeof value[0]]);
+          if (_t === 'Map') {
+            const v = value.reduce((a, b) => ({ ...a, ...b }));
+            dep.push(jsonToDart(v, t, config));
+            const type = `${typesMap.array}<${t}>`;
+            part2.push(`  ${config.required ? 'late' : ''}${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
+            part3.push(`    ${key} = List${config.required ? '' : '?'}.from(json['${key}']).map((e) => ${t}.fromJson(e)).toList();`);
+            part4.push(`    _data['${key}'] = ${key}${config.required ? '' : '?'}.map((e) => e.toJson()).toList();`);
+          } else {
+            const type = `${typesMap.array}<${_t}>`;
+            part2.push(`  ${config.required ? 'late' : ''}${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
+            part3.push(`    ${config.required ? '' : "if (json['list2'] != null) "}${key} = List.castFrom<dynamic, ${_t}>(json['${key}']);`);
+            part4.push(`    _data['${key}'] = ${key};`);
+          }
         } else if (typeof value === 'object') {
           const type = name + key[0].toUpperCase() + key.slice(1);
           const v = jsonToDart(value, type, config);
           dep.push(v);
-          part2.push(`  late${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
+          part2.push(`  ${config.required ? 'late' : ''}${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
 
           part3.push(`    ${key} = ${type}.fromJson(json['${key}']);`);
           part4.push(`    _data['${key}'] = ${key}${config.required ? '' : '?'}.toJson();`);
         } else {
-          part2.push(`  late${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
+          part2.push(`  ${config.required ? 'late' : ''}${config.final ? ' final' : ''} ${type}${config.required ? '' : '?'} ${key};`);
           part3.push(`    ${key} = json['${key}'];`);
           part4.push(`    _data['${key}'] = ${key};`);
         }
@@ -138,6 +146,10 @@
 
     function handleConfigChange(it) {
       config[it.id.split('_')[1]] = it.checked;
+      if (!config.required) {
+        config.final = false;
+        config_final.checked = false;
+      }
       localStorage.setItem('config', JSON.stringify(config));
       handleInput();
     }
@@ -152,8 +164,14 @@
           map: {
             number: 123
           },
+          list2: [1, 2, 3],
+          list3: ['1', '2', '3'],
+          list4: ['1', 2, 3],
 
-          list: [{ string: 'asdsd' }, { number: 123 }]
+          list: [
+            { string: 'asdsd', aa: 123 },
+            { number: 123, string: '12', aa: '123' }
+          ]
         },
         void 0,
         2
