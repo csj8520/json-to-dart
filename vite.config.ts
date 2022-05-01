@@ -5,5 +5,6 @@ import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-i
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [vue(), createStyleImportPlugin({ resolves: [ElementPlusResolve()] })]
 });
