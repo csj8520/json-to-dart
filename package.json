@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "esno ./test/test.ts && dart test/test.dart"
   },
   "dependencies": {
+    "@vueuse/core": "^8.3.1",
     "codemirror": "^5.65.3",
     "element-plus": "^2.1.11",
     "normalize.css": "^8.0.1",
@@ -15,8 +17,10 @@
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.5",
+    "@types/node": "^17.0.31",
     "@vitejs/plugin-vue": "^2.3.1",
     "consola": "^2.15.3",
+    "esno": "^0.14.1",
     "sass": "^1.51.0",
     "typescript": "^4.6.4",
     "vite": "^2.9.6",

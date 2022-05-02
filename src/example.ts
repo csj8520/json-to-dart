@@ -26,7 +26,10 @@ export const example = `{
       "number": 123,
       "dyanmic": 2324,
       "arr": [1, 2, 3],
-      "arr2": ["1", 2, 3]
+      "arr2": ["1", 2, 3],
+      "deep-obj": {
+        "ss": "33"
+      }
     }
   ]
 }

@@ -69,6 +69,7 @@ body,
 <script setup lang="ts">
 import CodeMirror from 'codemirror';
 import { onMounted, reactive, ref, watch } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 import { ElMessage, ElInput, ElCheckbox, ElSelect, ElOption, ElFormItem, ElForm } from 'element-plus';
 
 import 'codemirror/lib/codemirror.css';
@@ -98,16 +99,23 @@ const requiredOption = [
 let codeJson: CodeMirror.EditorFromTextArea;
 let codeDart: CodeMirror.EditorFromTextArea;
 
-const handleChange = () => {
+const handleChange = useDebounceFn(() => {
   try {
     const value = codeJson.getValue().trim();
     if (!value) return;
     const json = JSON.parse(value);
-    codeDart.setValue(typeToDart(jsonToType(json), { ...config, name: config.name || 'Root' }).join('\n'));
-  } catch (e) {
+    try {
+      codeDart.setValue(typeToDart(jsonToType(json), { ...config, name: config.name || 'Root' }).join('\n'));
+    } catch (error) {
+      console.error(error);
+      ElMessage.error('解析失败');
+    }
+  } catch (error) {
+    console.error(error);
     ElMessage.error('json 格式有误');
   }
-};
+}, 500);
+
 watch(config, () => {
   localStorage.setItem('config', JSON.stringify(config));
   handleChange();
