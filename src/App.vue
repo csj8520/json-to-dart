@@ -6,7 +6,7 @@
           <el-input v-model="config.name" type="text" placeholder="class Name" />
         </el-form-item>
         <el-form-item label="required">
-          <el-select v-model="required" placeholder="Select">
+          <el-select v-model="config.required" placeholder="Select">
             <el-option v-for="item in requiredOption" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -33,10 +33,20 @@ body,
   height: 100%;
   overflow: hidden;
 }
+:root {
+  --them-dark-primary: #151718;
+  --them-dark-border: #2b2d2e;
+  --el-fill-color-blank: var(--them-dark-primary);
+  --el-bg-color-overlay: var(--them-dark-primary);
+  --el-fill-color-light: var(--them-dark-border);
+  --el-border-color: var(--them-dark-border);
+  --el-border-color-light: var(--them-dark-border);
+  --el-text-color-regular: #eee;
+}
 .home {
   display: flex;
   flex-direction: column;
-  // background-color: #151718;
+  background-color: var(--them-dark-primary);
   &__config {
     .el-form {
       display: flex;
@@ -54,13 +64,12 @@ body,
     &__right {
       flex: 1;
       overflow-y: auto;
-      border-right: solid 1px #ccc;
       .CodeMirror {
         min-height: 100%;
       }
     }
-    &__right {
-      border: none;
+    &__left {
+      border-right: solid 1px var(--them-dark-border);
     }
   }
 }
@@ -68,8 +77,8 @@ body,
 
 <script setup lang="ts">
 import CodeMirror from 'codemirror';
-import { onMounted, reactive, ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { ElMessage, ElInput, ElCheckbox, ElSelect, ElOption, ElFormItem, ElForm } from 'element-plus';
 
 import 'codemirror/lib/codemirror.css';
@@ -83,17 +92,16 @@ import { jsonToType, typeToDart, TypeToDartConfig } from './utils';
 const codeLeft = ref<HTMLTextAreaElement>(null!);
 const codeRight = ref<HTMLTextAreaElement>(null!);
 
-const config = reactive<TypeToDartConfig>({ name: 'Root', auto: true, required: false, final: false });
+const config = reactive<TypeToDartConfig>({ name: 'Root', required: 'auto', final: false });
 try {
-  const _config = JSON.parse(localStorage.getItem('config') || '{}');
-  Object.assign(config, _config);
+  const { name, required, final } = JSON.parse(localStorage.getItem('config') || '{}') as TypeToDartConfig;
+  Object.assign(config, { name, required, final });
 } catch (_) {}
 
-const required = ref(config.auto ? 'auto' : config.required ? 'add' : 'remove');
 const requiredOption = [
   { label: '自动', value: 'auto' },
-  { label: '添加', value: 'add' },
-  { label: '移除', value: 'remove' }
+  { label: '添加', value: 'force' },
+  { label: '移除', value: 'none' }
 ];
 
 let codeJson: CodeMirror.EditorFromTextArea;
@@ -116,21 +124,13 @@ const handleChange = useDebounceFn(() => {
   }
 }, 500);
 
-watch(config, () => {
+const handleSaveConfig = useDebounceFn(() => {
   localStorage.setItem('config', JSON.stringify(config));
-  handleChange();
-});
+}, 500);
 
-watch(required, () => {
-  if (required.value === 'auto') {
-    config.auto = true;
-  } else if (required.value === 'add') {
-    config.auto = false;
-    config.required = true;
-  } else {
-    config.auto = false;
-    config.required = false;
-  }
+watch(config, () => {
+  handleSaveConfig();
+  handleChange();
 });
 
 onMounted(() => {

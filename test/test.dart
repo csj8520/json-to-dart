@@ -5,8 +5,8 @@ import 'example.dart';
 
 void main() async {
   final file = File("${Platform.script.toFilePath().replaceFirst('test/test.dart', '')}/src/example.ts");
-  final _js = (await file.readAsString()).replaceAll('export const example = `', '').replaceAll('`;', '');
-  final _json = json.decode(_js);
+  final text = (await file.readAsString()).replaceAll('export const example = `', '').replaceAll('`;', '');
+  final _json = json.decode(text);
   final example = Example.fromJson(_json);
   test('string', example.string == 'string');
   test('boolean', example.boolean == true);

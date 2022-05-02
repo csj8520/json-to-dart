@@ -9,8 +9,7 @@ const typesMap: Record<string, string> = {
 };
 export interface TypeToDartConfig {
   name: string;
-  auto: boolean;
-  required: boolean;
+  required: 'auto' | 'force' | 'none';
   final: boolean;
 }
 
@@ -51,7 +50,7 @@ const convertParams = (types: JsonToType[], config: TypeToDartConfig): string[] 
   const strs: string[] = [];
   strs.push(`  ${config.name}({`);
   for (const it of types) {
-    const addRequired = (config.auto ? it.required : config.required) ? 'required ' : '';
+    const addRequired = (config.required == 'auto' ? it.required : config.required === 'force') ? 'required ' : '';
     strs.push(`    ${addRequired}this.${camelize(it.key)},`);
   }
   strs.push(`  });`);
@@ -63,7 +62,7 @@ const convertKeys = (types: JsonToType[], config: TypeToDartConfig): string[] =>
   const addFinal = config.final ? 'final ' : '';
   for (const it of types) {
     const key = camelize(it.key);
-    const required = config.auto ? it.required : config.required;
+    const required = config.required === 'auto' ? it.required : config.required === 'force';
     const addRequired = required ? '' : '?';
     const addLate = required ? 'late ' : '';
     let type = it.types.length > 1 ? 'dynamic' : typesMap[it.types[0]];
@@ -87,7 +86,7 @@ const convertFromJson = (types: JsonToType[], config: TypeToDartConfig): string[
   strs.push(`  ${config.name}.fromJson(Map<String, dynamic> json) {`);
   for (const it of types) {
     const key = camelize(it.key);
-    const addRequired = (config.auto ? it.required : config.required) ? '' : `if (json['${it.key}'] != null) `;
+    const addRequired = (config.required === 'auto' ? it.required : config.required === 'force') ? '' : `if (json['${it.key}'] != null) `;
     if (it.types.length === 1 && it.types[0] === 'array') {
       if (it.item) {
         const t = it.item.types.length > 1 ? 'dynamic' : typesMap[it.item.types[0]];
@@ -113,7 +112,7 @@ const convertToJson = (types: JsonToType[], config: TypeToDartConfig): string[] 
   strs.push('    final _data = <String, dynamic>{};');
   for (const it of types) {
     const key = camelize(it.key);
-    const addRequired = (config.auto ? it.required : config.required) ? '' : '?';
+    const addRequired = (config.required === 'auto' ? it.required : config.required === 'force') ? '' : '?';
     if (it.types.length === 1 && it.types[0] === 'object') {
       strs.push(`    _data['${it.key}'] = ${key}${addRequired}.toJson();`);
     } else if (it.types.length === 1 && it.types[0] === 'array' && !it.item) {
