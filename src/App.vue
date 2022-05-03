@@ -63,9 +63,12 @@ body,
     &__left,
     &__right {
       flex: 1;
-      overflow-y: auto;
+      overflow: hidden;
       .CodeMirror {
         min-height: 100%;
+        .CodeMirror-vscrollbar {
+          background: rgba(0, 0, 0, 0.002);
+        }
       }
     }
     &__left {
@@ -114,7 +117,9 @@ const handleChange = useDebounceFn(() => {
     if (!value) return;
     const json = JSON5.parse(value);
     try {
+      const scrollInfo = codeDart.getScrollInfo();
       codeDart.setValue(typeToDart(jsonToType(json), { ...config, name: config.name || 'Example' }).join('\n'));
+      codeDart.scrollTo(scrollInfo.left, scrollInfo.top);
     } catch (error) {
       console.error(error);
       ElMessage.error('解析失败');
@@ -138,7 +143,7 @@ onMounted(() => {
   codeLeft.value.value = example;
   codeJson = CodeMirror.fromTextArea(codeLeft.value, { lineNumbers: true, mode: { name: 'javascript', json: true }, theme: 'seti' });
   codeJson.on('change', handleChange);
-  codeDart = CodeMirror.fromTextArea(codeRight.value, { lineNumbers: true, mode: 'dart', theme: 'seti' });
+  codeDart = CodeMirror.fromTextArea(codeRight.value, { lineNumbers: true, mode: 'dart', theme: 'seti', readOnly: true });
   handleChange();
 });
 </script>

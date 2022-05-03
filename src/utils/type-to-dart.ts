@@ -130,7 +130,7 @@ const convertToJson = (types: JsonToType[], config: TypeToDartConfig): string[] 
 };
 
 export const camelize = (str: string) => {
-  return str.replace(/[-\s](\w)/g, (_, s) => s.toUpperCase());
+  return str.replace(/[-\s]+(\w)/g, (_, s) => s.toUpperCase());
 };
 
 export const bigCamelize = (str: string) => {
