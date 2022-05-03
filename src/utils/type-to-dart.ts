@@ -50,8 +50,9 @@ const convertParams = (types: JsonToType[], config: TypeToDartConfig): string[] 
   const strs: string[] = [];
   strs.push(`  ${config.name}({`);
   for (const it of types) {
-    const addRequired = (config.required == 'auto' ? it.required : config.required === 'force') ? 'required ' : '';
-    strs.push(`    ${addRequired}this.${camelize(it.key)},`);
+    const { camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    const addRequired = required ? 'required ' : '';
+    strs.push(`    ${addRequired}this.${camelizeKey},`);
   }
   strs.push(`  });`);
   return strs;
@@ -61,8 +62,7 @@ const convertKeys = (types: JsonToType[], config: TypeToDartConfig): string[] =>
   const strs: string[] = [];
   const addFinal = config.final ? 'final ' : '';
   for (const it of types) {
-    const key = camelize(it.key);
-    const required = config.required === 'auto' ? it.required : config.required === 'force';
+    const { camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
     const addRequired = required ? '' : '?';
     const addLate = required ? 'late ' : '';
     let type = it.types.length > 1 ? 'dynamic' : typesMap[it.types[0]];
@@ -71,12 +71,12 @@ const convertKeys = (types: JsonToType[], config: TypeToDartConfig): string[] =>
         const t = it.item.types.length > 1 ? 'dynamic' : typesMap[it.item.types[0]];
         type += `<${t}>`;
       } else {
-        type += `<${bigCamelize(`${config.name} ${key} item`)}>`;
+        type += `<${bigCamelize(`${config.name} ${camelizeKey} item`)}>`;
       }
     } else if (type === 'Map') {
-      type = `${bigCamelize(`${config.name} ${key}`)}`;
+      type = `${bigCamelize(`${config.name} ${camelizeKey}`)}`;
     }
-    strs.push(`  ${addLate}${addFinal}${type}${addRequired} ${key};`);
+    strs.push(`  ${addLate}${addFinal}${type}${addRequired} ${camelizeKey};`);
   }
   return strs;
 };
@@ -85,21 +85,24 @@ const convertFromJson = (types: JsonToType[], config: TypeToDartConfig): string[
   const strs: string[] = [];
   strs.push(`  ${config.name}.fromJson(Map<String, dynamic> json) {`);
   for (const it of types) {
-    const key = camelize(it.key);
-    const addRequired = (config.required === 'auto' ? it.required : config.required === 'force') ? '' : `if (json['${it.key}'] != null) `;
+    const { key, camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    // const key = camelize(it.key);
+    const addRequired = required ? '' : `if (json['${key}'] != null) `;
     if (it.types.length === 1 && it.types[0] === 'array') {
       if (it.item) {
         const t = it.item.types.length > 1 ? 'dynamic' : typesMap[it.item.types[0]];
-        strs.push(`    ${addRequired}${key} = List.castFrom<dynamic, ${t}>(json['${it.key}']);`);
+        strs.push(`    ${addRequired}${camelizeKey} = List.castFrom<dynamic, ${t}>(json['${key}']);`);
       } else {
         strs.push(
-          `    ${addRequired}${key} = List.from(json['${it.key}']).map((e) => ${bigCamelize(`${config.name} ${it.key} item`)}.fromJson(e)).toList();`
+          `    ${addRequired}${camelizeKey} = List.from(json['${key}']).map((e) => ${bigCamelize(
+            `${config.name} ${key} item`
+          )}.fromJson(e)).toList();`
         );
       }
     } else if (it.types.length === 1 && it.types[0] === 'object') {
-      strs.push(`    ${addRequired}${key} = ${bigCamelize(`${config.name} ${it.key}`)}.fromJson(json['${it.key}']);`);
+      strs.push(`    ${addRequired}${camelizeKey} = ${bigCamelize(`${config.name} ${key}`)}.fromJson(json['${key}']);`);
     } else {
-      strs.push(`    ${key} = json['${it.key}'];`);
+      strs.push(`    ${camelizeKey} = json['${key}'];`);
     }
   }
   strs.push('  }');
@@ -111,14 +114,14 @@ const convertToJson = (types: JsonToType[], config: TypeToDartConfig): string[] 
   strs.push('  Map<String, dynamic> toJson() {');
   strs.push('    final _data = <String, dynamic>{};');
   for (const it of types) {
-    const key = camelize(it.key);
-    const addRequired = (config.required === 'auto' ? it.required : config.required === 'force') ? '' : '?';
+    const { key, camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    const addRequired = required ? '' : '?';
     if (it.types.length === 1 && it.types[0] === 'object') {
-      strs.push(`    _data['${it.key}'] = ${key}${addRequired}.toJson();`);
+      strs.push(`    _data['${key}'] = ${camelizeKey}${addRequired}.toJson();`);
     } else if (it.types.length === 1 && it.types[0] === 'array' && !it.item) {
-      strs.push(`    _data['${it.key}'] = ${key}${addRequired}.map((e) => e.toJson()).toList();`);
+      strs.push(`    _data['${key}'] = ${camelizeKey}${addRequired}.map((e) => e.toJson()).toList();`);
     } else {
-      strs.push(`    _data['${it.key}'] = ${key};`);
+      strs.push(`    _data['${key}'] = ${camelizeKey};`);
     }
   }
   strs.push('    return _data;');
@@ -134,3 +137,20 @@ export const bigCamelize = (str: string) => {
   const s = camelize(str);
   return s[0].toUpperCase() + s.substring(1);
 };
+
+interface HandleRequiredOption {
+  key: string;
+  config: TypeToDartConfig;
+  required: boolean;
+}
+
+function handleRequired({ key, config, required }: HandleRequiredOption): { key: string; camelizeKey: string; required: boolean } {
+  const last = key[key.length - 1];
+  const _required = config.required === 'auto' ? required : config.required === 'force';
+  const _key = key.replace(/[!?]$/, '');
+  return {
+    key: _key,
+    camelizeKey: camelize(_key),
+    required: last === '!' ? true : last === '?' ? false : _required
+  };
+}

@@ -92,10 +92,10 @@ import { jsonToType, typeToDart, TypeToDartConfig } from './utils';
 const codeLeft = ref<HTMLTextAreaElement>(null!);
 const codeRight = ref<HTMLTextAreaElement>(null!);
 
-const config = reactive<TypeToDartConfig>({ name: 'Root', required: 'auto', final: false });
+const config = reactive<TypeToDartConfig>({ name: 'Example', required: 'auto', final: false });
 try {
-  const { name, required, final } = JSON.parse(localStorage.getItem('config') || '{}') as TypeToDartConfig;
-  Object.assign(config, { name, required, final });
+  const _config = JSON.parse(localStorage.getItem('config') || '{}') as TypeToDartConfig;
+  Object.assign(config, _config);
 } catch (_) {}
 
 const requiredOption = [
@@ -113,7 +113,7 @@ const handleChange = useDebounceFn(() => {
     if (!value) return;
     const json = JSON.parse(value);
     try {
-      codeDart.setValue(typeToDart(jsonToType(json), { ...config, name: config.name || 'Root' }).join('\n'));
+      codeDart.setValue(typeToDart(jsonToType(json), { ...config, name: config.name || 'Example' }).join('\n'));
     } catch (error) {
       console.error(error);
       ElMessage.error('解析失败');
@@ -125,7 +125,8 @@ const handleChange = useDebounceFn(() => {
 }, 500);
 
 const handleSaveConfig = useDebounceFn(() => {
-  localStorage.setItem('config', JSON.stringify(config));
+  const { name, required, final } = config;
+  localStorage.setItem('config', JSON.stringify({ name, required, final }));
 }, 500);
 
 watch(config, () => {
