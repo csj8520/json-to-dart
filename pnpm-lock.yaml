@@ -9,6 +9,7 @@ specifiers:
   consola: ^2.15.3
   element-plus: ^2.1.11
   esno: ^0.14.1
+  json5: ^2.2.1
   normalize.css: ^8.0.1
   sass: ^1.51.0
   typescript: ^4.6.4
@@ -21,6 +22,7 @@ dependencies:
   '@vueuse/core': 8.3.1_vue@3.2.33
   codemirror: 5.65.3
   element-plus: 2.1.11_vue@3.2.33
+  json5: 2.2.1
   normalize.css: 8.0.1
   vue: 3.2.33
 
@@ -747,6 +749,12 @@ packages:
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
+
+  /json5/2.2.1:
+    resolution: {integrity: sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==}
+    engines: {node: '>=6'}
+    hasBin: true
+    dev: false
 
   /jsonfile/6.1.0:
     resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}

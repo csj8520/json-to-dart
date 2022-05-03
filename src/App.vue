@@ -76,6 +76,7 @@ body,
 </style>
 
 <script setup lang="ts">
+import JSON5 from 'json5';
 import CodeMirror from 'codemirror';
 import { useDebounceFn } from '@vueuse/core';
 import { onMounted, reactive, ref, watch } from 'vue';
@@ -111,7 +112,7 @@ const handleChange = useDebounceFn(() => {
   try {
     const value = codeJson.getValue().trim();
     if (!value) return;
-    const json = JSON.parse(value);
+    const json = JSON5.parse(value);
     try {
       codeDart.setValue(typeToDart(jsonToType(json), { ...config, name: config.name || 'Example' }).join('\n'));
     } catch (error) {
@@ -119,8 +120,7 @@ const handleChange = useDebounceFn(() => {
       ElMessage.error('解析失败');
     }
   } catch (error) {
-    console.error(error);
-    ElMessage.error('json 格式有误');
+    ElMessage.error((error as Error).message);
   }
 }, 500);
 
