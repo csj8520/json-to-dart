@@ -40,19 +40,19 @@ class Example {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['string'] = string;
-    _data['boolean'] = boolean;
-    _data['number'] = number;
-    _data['array int'] = arrayInt;
-    _data['abc-ss'] = abcSs;
-    _data['array_string'] = array_string;
-    _data['array_dynamic'] = array_dynamic;
-    _data['string-force-maybe-null'] = stringForceMaybeNull;
-    _data['number-force-required'] = numberForceRequired;
-    _data['obj'] = obj.toJson();
-    _data['arrayObj'] = arrayObj.map((e) => e.toJson()).toList();
-    return _data;
+    return {
+      'string': string,
+      'boolean': boolean,
+      'number': number,
+      'array int': arrayInt,
+      'abc-ss': abcSs,
+      'array_string': array_string,
+      'array_dynamic': array_dynamic,
+      'string-force-maybe-null': stringForceMaybeNull,
+      'number-force-required': numberForceRequired,
+      'obj': obj.toJson(),
+      'arrayObj': arrayObj.map((e) => e.toJson()).toList(),
+    };
   }
 
   @override
@@ -76,10 +76,10 @@ class ExampleObj {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['a'] = a;
-    _data['b'] = b;
-    return _data;
+    return {
+      'a': a,
+      'b': b,
+    };
   }
 
   @override
@@ -124,17 +124,17 @@ class ExampleArrayObjItem {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['string'] = string;
-    _data['number'] = number;
-    _data['dyanmic'] = dyanmic;
-    _data['maybe-null'] = maybeNull;
-    _data['number-force-or-null'] = numberForceOrNull;
-    _data['deep-obj'] = deepObj.toJson();
-    _data['arr'] = arr;
-    _data['arr2'] = arr2;
-    _data['number-force-maybe-null'] = numberForceMaybeNull;
-    return _data;
+    return {
+      'string': string,
+      'number': number,
+      'dyanmic': dyanmic,
+      'maybe-null': maybeNull,
+      'number-force-or-null': numberForceOrNull,
+      'deep-obj': deepObj.toJson(),
+      'arr': arr,
+      'arr2': arr2,
+      'number-force-maybe-null': numberForceMaybeNull,
+    };
   }
 
   @override
@@ -158,10 +158,10 @@ class ExampleArrayObjItemDeepObj {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['ss'] = ss;
-    _data['arr'] = arr;
-    return _data;
+    return {
+      'ss': ss,
+      'arr': arr,
+    };
   }
 
   @override

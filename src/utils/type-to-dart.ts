@@ -32,13 +32,12 @@ export const typeToDart = (type: JsonToType, config: TypeToDartConfig): string[]
   strs.push('  }');
 
   strs.push(`}`);
+  strs.push('');
 
   for (const it of type.childrens) {
     if (it.types.length === 1 && it.types[0] === 'object') {
-      strs.push('');
       strs.push(...typeToDart(it, { ...config, name: `${config.name} ${it.key}` }));
     } else if (it.types.length === 1 && it.types[0] === 'array' && !it.item) {
-      strs.push('');
       strs.push(...typeToDart(it, { ...config, name: `${config.name} ${it.key} item` }));
     }
   }
@@ -112,19 +111,19 @@ const convertFromJson = (types: JsonToType[], config: TypeToDartConfig): string[
 const convertToJson = (types: JsonToType[], config: TypeToDartConfig): string[] => {
   const strs: string[] = [];
   strs.push('  Map<String, dynamic> toJson() {');
-  strs.push('    final _data = <String, dynamic>{};');
+  strs.push('    return {');
   for (const it of types) {
     const { key, camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
     const addRequired = required ? '' : '?';
     if (it.types.length === 1 && it.types[0] === 'object') {
-      strs.push(`    _data['${key}'] = ${camelizeKey}${addRequired}.toJson();`);
+      strs.push(`      '${key}': ${camelizeKey}${addRequired}.toJson(),`);
     } else if (it.types.length === 1 && it.types[0] === 'array' && !it.item) {
-      strs.push(`    _data['${key}'] = ${camelizeKey}${addRequired}.map((e) => e.toJson()).toList();`);
+      strs.push(`      '${key}': ${camelizeKey}${addRequired}.map((e) => e.toJson()).toList(),`);
     } else {
-      strs.push(`    _data['${key}'] = ${camelizeKey};`);
+      strs.push(`      '${key}': ${camelizeKey},`);
     }
   }
-  strs.push('    return _data;');
+  strs.push('    };');
   strs.push('  }');
   return strs;
 };
