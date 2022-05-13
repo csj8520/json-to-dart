@@ -8,6 +8,9 @@ export const example = `{
   "array_dynamic": [1, "3", "4"],
   "string-force-maybe-null?": "1",
   "number-force-required!": 1,
+  "originname1@changed1": 1,
+  "originname2@changed2-required!": 1,
+  "originname3@changed3-maybe-null?": 1,
   "obj": {
     "a": 1,
     "b": "1"

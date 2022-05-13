@@ -49,7 +49,7 @@ const convertParams = (types: JsonToType[], config: TypeToDartConfig): string[] 
   const strs: string[] = [];
   strs.push(`  ${config.name}({`);
   for (const it of types) {
-    const { camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    const { camelizeKey, required } = handleNameKeyword({ key: it.key, config, required: it.required });
     const addRequired = required ? 'required ' : '';
     strs.push(`    ${addRequired}this.${camelizeKey},`);
   }
@@ -61,7 +61,7 @@ const convertKeys = (types: JsonToType[], config: TypeToDartConfig): string[] =>
   const strs: string[] = [];
   const addFinal = config.final ? 'final ' : '';
   for (const it of types) {
-    const { camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    const { camelizeKey, required } = handleNameKeyword({ key: it.key, config, required: it.required });
     const addRequired = required ? '' : '?';
     const addLate = required ? 'late ' : '';
     let type = it.types.length > 1 ? 'dynamic' : typesMap[it.types[0]];
@@ -84,7 +84,7 @@ const convertFromJson = (types: JsonToType[], config: TypeToDartConfig): string[
   const strs: string[] = [];
   strs.push(`  ${config.name}.fromJson(Map<String, dynamic> json) {`);
   for (const it of types) {
-    const { key, camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    const { key, camelizeKey, required } = handleNameKeyword({ key: it.key, config, required: it.required });
     // const key = camelize(it.key);
     const addRequired = required ? '' : `if (json['${key}'] != null) `;
     if (it.types.length === 1 && it.types[0] === 'array') {
@@ -113,7 +113,7 @@ const convertToJson = (types: JsonToType[], config: TypeToDartConfig): string[] 
   strs.push('  Map<String, dynamic> toJson() {');
   strs.push('    return {');
   for (const it of types) {
-    const { key, camelizeKey, required } = handleRequired({ key: it.key, config, required: it.required });
+    const { key, camelizeKey, required } = handleNameKeyword({ key: it.key, config, required: it.required });
     const addRequired = required ? '' : '?';
     if (it.types.length === 1 && it.types[0] === 'object') {
       strs.push(`      '${key}': ${camelizeKey}${addRequired}.toJson(),`);
@@ -143,13 +143,14 @@ interface HandleRequiredOption {
   required: boolean;
 }
 
-function handleRequired({ key, config, required }: HandleRequiredOption): { key: string; camelizeKey: string; required: boolean } {
+function handleNameKeyword({ key, config, required }: HandleRequiredOption): { key: string; camelizeKey: string; required: boolean } {
   const last = key[key.length - 1];
   const _required = config.required === 'auto' ? required : config.required === 'force';
   const _key = key.replace(/[!?]$/, '');
+  const rename = _key.match(/^(.+)@(.+)/);
   return {
-    key: _key,
-    camelizeKey: camelize(_key),
+    key: rename?.[1] ?? _key,
+    camelizeKey: camelize(rename?.[2] ?? _key),
     required: last === '!' ? true : last === '?' ? false : _required
   };
 }

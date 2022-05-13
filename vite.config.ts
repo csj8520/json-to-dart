@@ -5,6 +5,9 @@ import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-i
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: 3005
+  },
   base: './',
   plugins: [vue(), createStyleImportPlugin({ resolves: [ElementPlusResolve()] })]
 });

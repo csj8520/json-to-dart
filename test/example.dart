@@ -9,6 +9,9 @@ class Example {
     required this.array_dynamic,
     this.stringForceMaybeNull,
     required this.numberForceRequired,
+    required this.changed1,
+    required this.changed2Required,
+    this.changed3MaybeNull,
     required this.obj,
     required this.arrayObj,
   });
@@ -22,6 +25,9 @@ class Example {
   late List<dynamic> array_dynamic;
   String? stringForceMaybeNull;
   late int numberForceRequired;
+  late int changed1;
+  late int changed2Required;
+  int? changed3MaybeNull;
   late ExampleObj obj;
   late List<ExampleArrayObjItem> arrayObj;
 
@@ -35,6 +41,9 @@ class Example {
     array_dynamic = List.castFrom<dynamic, dynamic>(json['array_dynamic']);
     stringForceMaybeNull = json['string-force-maybe-null'];
     numberForceRequired = json['number-force-required'];
+    changed1 = json['originname1'];
+    changed2Required = json['originname2'];
+    changed3MaybeNull = json['originname3'];
     obj = ExampleObj.fromJson(json['obj']);
     arrayObj = List.from(json['arrayObj']).map((e) => ExampleArrayObjItem.fromJson(e)).toList();
   }
@@ -50,6 +59,9 @@ class Example {
       'array_dynamic': array_dynamic,
       'string-force-maybe-null': stringForceMaybeNull,
       'number-force-required': numberForceRequired,
+      'originname1': changed1,
+      'originname2': changed2Required,
+      'originname3': changed3MaybeNull,
       'obj': obj.toJson(),
       'arrayObj': arrayObj.map((e) => e.toJson()).toList(),
     };
