@@ -4,6 +4,8 @@ import fs from 'fs/promises';
 
 (async () => {
   const json = JSON.parse(example);
-  const result = typeToDart(jsonToType(json), { name: 'Example', final: false, required: 'auto' }).join('\n');
-  await fs.writeFile('./test/example.dart', result, 'utf8');
+  const resultExample = typeToDart(jsonToType(json), { name: 'Example', final: false, required: 'auto' }).join('\n');
+  await fs.writeFile('./test/example.dart', resultExample, 'utf8');
+  const resultExampleFinal = typeToDart(jsonToType(json), { name: 'ExampleFinal', final: true, required: 'auto' }).join('\n');
+  await fs.writeFile('./test/example_final.dart', resultExampleFinal, 'utf8');
 })();

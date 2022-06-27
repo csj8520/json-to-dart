@@ -96,9 +96,14 @@ import { jsonToType, typeToDart, TypeToDartConfig } from './utils';
 const codeLeft = ref<HTMLTextAreaElement>(null!);
 const codeRight = ref<HTMLTextAreaElement>(null!);
 
+const storageKeys = {
+  config: 'json-to-dart.config',
+  code: 'json-to-dart.code'
+} as const;
+
 const config = reactive<TypeToDartConfig>({ name: 'Example', required: 'auto', final: false });
 try {
-  const _config = JSON.parse(localStorage.getItem('config') || '{}') as TypeToDartConfig;
+  const _config = JSON.parse(localStorage.getItem(storageKeys.config) || '{}') as TypeToDartConfig;
   Object.assign(config, _config);
 } catch (_) {}
 
@@ -114,6 +119,7 @@ let codeDart: CodeMirror.EditorFromTextArea;
 const handleChange = useDebounceFn(() => {
   try {
     const value = codeJson.getValue().trim();
+    localStorage.setItem(storageKeys.code, value);
     if (!value) return;
     const json = JSON5.parse(value);
     try {
@@ -127,12 +133,13 @@ const handleChange = useDebounceFn(() => {
   } catch (error) {
     ElMessage.error((error as Error).message);
   }
-}, 500);
+}, 100);
 
 const handleSaveConfig = useDebounceFn(() => {
   const { name, required, final } = config;
-  localStorage.setItem('config', JSON.stringify({ name, required, final }));
-}, 500);
+  const _config: TypeToDartConfig = { name, required, final };
+  localStorage.setItem(storageKeys.config, JSON.stringify(_config));
+}, 100);
 
 watch(config, () => {
   handleSaveConfig();
@@ -140,7 +147,7 @@ watch(config, () => {
 });
 
 onMounted(() => {
-  codeLeft.value.value = example;
+  codeLeft.value.value = localStorage.getItem(storageKeys.code) || example;
   codeJson = CodeMirror.fromTextArea(codeLeft.value, { lineNumbers: true, mode: { name: 'javascript', json: true }, theme: 'seti' });
   codeJson.on('change', handleChange);
   codeDart = CodeMirror.fromTextArea(codeRight.value, { lineNumbers: true, mode: 'dart', theme: 'seti', readOnly: true });

@@ -6,6 +6,7 @@ export const example = `{
   "abc-ss": 1,
   "array_string": ["2", "3", "4"],
   "array_dynamic": [1, "3", "4"],
+  "array_int-or-null?": [1, 2],
   "string-force-maybe-null?": "1",
   "number-force-required!": 1,
   "originname1@changed1": 1,

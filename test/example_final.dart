@@ -1,5 +1,5 @@
-class Example {
-  Example({
+class ExampleFinal {
+  ExampleFinal({
     required this.string,
     required this.boolean,
     required this.number,
@@ -17,23 +17,23 @@ class Example {
     required this.arrayObj,
   });
 
-  late String string;
-  late bool boolean;
-  late int number;
-  late List<int> arrayInt;
-  late int abcSs;
-  late List<String> array_string;
-  late List<dynamic> array_dynamic;
-  late List<int>? array_intOrNull;
-  late String? stringForceMaybeNull;
-  late int numberForceRequired;
-  late int changed1;
-  late int changed2Required;
-  late int? changed3MaybeNull;
-  late ExampleObj obj;
-  late List<ExampleArrayObjItem> arrayObj;
+  late final String string;
+  late final bool boolean;
+  late final int number;
+  late final List<int> arrayInt;
+  late final int abcSs;
+  late final List<String> array_string;
+  late final List<dynamic> array_dynamic;
+  late final List<int>? array_intOrNull;
+  late final String? stringForceMaybeNull;
+  late final int numberForceRequired;
+  late final int changed1;
+  late final int changed2Required;
+  late final int? changed3MaybeNull;
+  late final ExampleFinalObj obj;
+  late final List<ExampleFinalArrayObjItem> arrayObj;
 
-  Example.fromJson(Map<String, dynamic> json) {
+  ExampleFinal.fromJson(Map<String, dynamic> json) {
     string = json['string'];
     boolean = json['boolean'];
     number = json['number'];
@@ -47,8 +47,8 @@ class Example {
     changed1 = json['originname1'];
     changed2Required = json['originname2'];
     changed3MaybeNull = json['originname3'];
-    obj = ExampleObj.fromJson(json['obj']);
-    arrayObj = List.from(json['arrayObj']).map((e) => ExampleArrayObjItem.fromJson(e)).toList();
+    obj = ExampleFinalObj.fromJson(json['obj']);
+    arrayObj = List.from(json['arrayObj']).map((e) => ExampleFinalArrayObjItem.fromJson(e)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -77,16 +77,16 @@ class Example {
   }
 }
 
-class ExampleObj {
-  ExampleObj({
+class ExampleFinalObj {
+  ExampleFinalObj({
     required this.a,
     required this.b,
   });
 
-  late int a;
-  late String b;
+  late final int a;
+  late final String b;
 
-  ExampleObj.fromJson(Map<String, dynamic> json) {
+  ExampleFinalObj.fromJson(Map<String, dynamic> json) {
     a = json['a'];
     b = json['b'];
   }
@@ -104,8 +104,8 @@ class ExampleObj {
   }
 }
 
-class ExampleArrayObjItem {
-  ExampleArrayObjItem({
+class ExampleFinalArrayObjItem {
+  ExampleFinalArrayObjItem({
     required this.string,
     required this.number,
     required this.dyanmic,
@@ -117,23 +117,23 @@ class ExampleArrayObjItem {
     this.numberForceMaybeNull,
   });
 
-  late String string;
-  late int number;
-  late dynamic dyanmic;
-  late String? maybeNull;
-  late int? numberForceOrNull;
-  late ExampleArrayObjItemDeepObj deepObj;
-  late List<int>? arr;
-  late List<dynamic>? arr2;
-  late int? numberForceMaybeNull;
+  late final String string;
+  late final int number;
+  late final dynamic dyanmic;
+  late final String? maybeNull;
+  late final int? numberForceOrNull;
+  late final ExampleFinalArrayObjItemDeepObj deepObj;
+  late final List<int>? arr;
+  late final List<dynamic>? arr2;
+  late final int? numberForceMaybeNull;
 
-  ExampleArrayObjItem.fromJson(Map<String, dynamic> json) {
+  ExampleFinalArrayObjItem.fromJson(Map<String, dynamic> json) {
     string = json['string'];
     number = json['number'];
     dyanmic = json['dyanmic'];
     maybeNull = json['maybe-null'];
     numberForceOrNull = json['number-force-or-null'];
-    deepObj = ExampleArrayObjItemDeepObj.fromJson(json['deep-obj']);
+    deepObj = ExampleFinalArrayObjItemDeepObj.fromJson(json['deep-obj']);
     arr = json['arr'] == null ? null : List.castFrom<dynamic, int>(json['arr']);
     arr2 = json['arr2'] == null ? null : List.castFrom<dynamic, dynamic>(json['arr2']);
     numberForceMaybeNull = json['number-force-maybe-null'];
@@ -159,16 +159,16 @@ class ExampleArrayObjItem {
   }
 }
 
-class ExampleArrayObjItemDeepObj {
-  ExampleArrayObjItemDeepObj({
+class ExampleFinalArrayObjItemDeepObj {
+  ExampleFinalArrayObjItemDeepObj({
     required this.ss,
     this.arr,
   });
 
-  late String ss;
-  late List<int>? arr;
+  late final String ss;
+  late final List<int>? arr;
 
-  ExampleArrayObjItemDeepObj.fromJson(Map<String, dynamic> json) {
+  ExampleFinalArrayObjItemDeepObj.fromJson(Map<String, dynamic> json) {
     ss = json['ss'];
     arr = json['arr'] == null ? null : List.castFrom<dynamic, int>(json['arr']);
   }

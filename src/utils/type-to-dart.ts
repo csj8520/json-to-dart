@@ -63,7 +63,6 @@ const convertKeys = (types: JsonToType[], config: TypeToDartConfig): string[] =>
   for (const it of types) {
     const { camelizeKey, required } = handleNameKeyword({ key: it.key, config, required: it.required });
     const addRequired = required ? '' : '?';
-    const addLate = required ? 'late ' : '';
     let type = it.types.length > 1 ? 'dynamic' : typesMap[it.types[0]];
     if (type === 'List') {
       if (it.item) {
@@ -75,7 +74,7 @@ const convertKeys = (types: JsonToType[], config: TypeToDartConfig): string[] =>
     } else if (type === 'Map') {
       type = `${bigCamelize(`${config.name} ${camelizeKey}`)}`;
     }
-    strs.push(`  ${addLate}${addFinal}${type}${addRequired} ${camelizeKey};`);
+    strs.push(`  late ${addFinal}${type}${addRequired} ${camelizeKey};`);
   }
   return strs;
 };
@@ -85,21 +84,20 @@ const convertFromJson = (types: JsonToType[], config: TypeToDartConfig): string[
   strs.push(`  ${config.name}.fromJson(Map<String, dynamic> json) {`);
   for (const it of types) {
     const { key, camelizeKey, required } = handleNameKeyword({ key: it.key, config, required: it.required });
-    // const key = camelize(it.key);
-    const addRequired = required ? '' : `if (json['${key}'] != null) `;
+    const addRequired = required ? '' : `json['${key}'] == null ? null : `;
     if (it.types.length === 1 && it.types[0] === 'array') {
       if (it.item) {
         const t = it.item.types.length > 1 ? 'dynamic' : typesMap[it.item.types[0]];
-        strs.push(`    ${addRequired}${camelizeKey} = List.castFrom<dynamic, ${t}>(json['${key}']);`);
+        strs.push(`    ${camelizeKey} = ${addRequired}List.castFrom<dynamic, ${t}>(json['${key}']);`);
       } else {
         strs.push(
-          `    ${addRequired}${camelizeKey} = List.from(json['${key}']).map((e) => ${bigCamelize(
+          `    ${camelizeKey} = ${addRequired}List.from(json['${key}']).map((e) => ${bigCamelize(
             `${config.name} ${key} item`
           )}.fromJson(e)).toList();`
         );
       }
     } else if (it.types.length === 1 && it.types[0] === 'object') {
-      strs.push(`    ${addRequired}${camelizeKey} = ${bigCamelize(`${config.name} ${key}`)}.fromJson(json['${key}']);`);
+      strs.push(`    ${camelizeKey} = ${addRequired}${bigCamelize(`${config.name} ${key}`)}.fromJson(json['${key}']);`);
     } else {
       strs.push(`    ${camelizeKey} = json['${key}'];`);
     }
